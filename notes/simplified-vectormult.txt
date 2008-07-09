@@ -1,0 +1,19 @@
+
+
+M = a00 a01 a02 a03  v = x
+    a10 a11 a12 a13      y 
+    a20 a21 a22 a23      z
+    a30 a31 a32 a33      w
+
+v' = Mv = x'
+          y'
+          z'
+          w'
+
+--
+
+x' = a00*x + a01*y + a02*z + a03*w
+y' = a10*x + a11*y + a12*z + a13*w
+z' = a20*x + a21*y + a22*z + a23*w
+w' = a30*x + a31*y + a32*z + a33*w
+
