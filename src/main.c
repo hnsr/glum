@@ -126,9 +126,8 @@ static int cur_tex;
 
 // Test triangles
 float triangles[][36] = {
-    #include "test3.tris"
+    #include "../data/test3.tris"
 };
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,10 +160,10 @@ static void context_init(int width, int height)
 {
     context = glum_context_new(width, height);
     
-    textures[0] = glum_texture_from_file("data/border.png");
-    textures[1] = glum_texture_from_file("data/grid.png");
-    textures[2] = glum_texture_from_file("data/gras.jpg");
-    textures[3] = glum_texture_from_file("data/hitch1.jpg");
+    textures[0] = glum_texture_from_file("../data/border.png");
+    textures[1] = glum_texture_from_file("../data/grid.png");
+    textures[2] = glum_texture_from_file("../data/gras.jpg");
+    textures[3] = glum_texture_from_file("../data/hitch1.jpg");
     context->texture = textures[cur_tex];
 
     glum_set_clear_color(context, GLUM_COLOR(0,0,0,255));
@@ -183,7 +182,7 @@ static void ui_init(void)
 {
     GtkWidget *window_main;
 
-    gxml = glade_xml_new("glum.glade", NULL, NULL);
+    gxml = glade_xml_new("../data/glum.glade", NULL, NULL);
     g_assert( NULL != gxml );
 
     glade_xml_signal_autoconnect(gxml);

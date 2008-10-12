@@ -1,0 +1,4 @@
+Import('env')
+
+glum = env.Program('glum', Glob('*.c'))
+

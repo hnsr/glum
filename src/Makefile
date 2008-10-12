@@ -40,7 +40,7 @@ glum: ${OBJECTS}
 draw_asm.o: draw_asm.asm
 	nasm -g -f elf draw_asm.asm
 
-main.o: main.c glum.h texture.h test.tris test2.tris test3.tris
+main.o: main.c glum.h texture.h ../data/test.tris ../data/test2.tris ../data/test3.tris
 	${CC} ${CFLAGS} -c main.c
 
 texture.o: texture.c texture.h
