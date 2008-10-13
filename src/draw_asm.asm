@@ -4,7 +4,10 @@ segment .bss
 
 segment .text
     global glum_clear_asm
+    global _glum_clear_asm
+
 glum_clear_asm:
+_glum_clear_asm:
 
     push    ebp
     mov     ebp, esp

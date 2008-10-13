@@ -1,5 +1,8 @@
 Import('env')
 
-#node = env.Object('draw_asm.asm')
-glum = env.Program('glum', Glob('*.c'))
+asm_files = []
+if 'NO_ASM' not in env['CPPDEFINES']:
+    asm_files = Glob('*.asm')
+    
+glum = env.Program('glum', Glob('*.c') + asm_files)
 

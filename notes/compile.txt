@@ -1,10 +1,62 @@
 
-Performance impact of various GCC optimisation flags (tested with bilinear
-filtering enabled):
+Compiling on *nix:
 
-Without -fomit-frame-pointer  slightly slower
-Without -ffast-math           about 35-40% slower
-Without -funroll-loops        slightly *faster*
-Without -march=prescott       75% slower
-Without -O2                   60% slower
+  - Install Python, SCons, nasm, GTK+, libglade, DevIL.
+  - In the directory holding the sources, run 'scons' to compile Glum.
+
+
+Compiling on Windows:
+  
+  MinGW is used for now for compilation on Windows.
+
+  - Install Python into C:\Python26
+
+  - Install Scons (its setup program should pick the right install location, which should be
+    somewhere under the Python installation directory)
+
+  - Install MinGW into C:\MinGW
+
+  - Install/Extract nasm into C:\Program Files\nasm
+
+  - Add "C:\Python26", "C:\Python26\Scripts", "C:\MinGW\bin", and "C:\Program Files\nasm" to the
+    PATH environment variable so the various utilities needed during the building can be found. It
+    should look similar to:
+
+      C:\WINDOWS\system32;C:\WINDOWS;C:\Python26;C:\Python26\Scripts;C:\MinGW\bin;C:\Program Files\nasm
+
+    (To modify the PATH environment variable, right click on "My Computer", click "Properties", then
+    select the Advanced tab, and click on the "Environment Variables" button. To inspect the PATH
+    env. var, open a command shell and run "echo %PATH%")
+
+  - TODO: Install headers/libs for required libraries (DevIL, GTK+, libglade)
+  - TODO: Install DLLs needed at runtime
+
+  - Open command shell, CD into the Glum source directory and run "scons" to compile.
+
+Notes on DevIL on Windows:
+
+  The SDK package only includes DLLs/.exp/.lib files. It seems to get things going with MinGW some
+  time ago I generated .a libraries, need to figure this out again so I can try the latest version.
+  Found more info at http://devpaks.org/details.php?devpak=99, it involves using the 'reimp' program
+  from mingw-utils to generate a static library (.a) from a .lib.
+
+Tested versions:
+            *nix        Windows
+  Python:   2.6         2.5
+  SCons:    1.0.0       1.0.1
+  nasm:     2.03.01     2.04?
+  GCC:      4.3.2       mingw-5.1.4 (installer)
+  libglade: 2.6.3       ?
+  DevIL:    1.6.8-rc2   ?
+  GTK+:     2.14.3      ?
+
+
+Note to self: Performance impact of various GCC optimisation flags (tested with bilinear filtering
+enabled):
+
+  Without -fomit-frame-pointer  slightly slower
+  Without -ffast-math           about 35-40% slower
+  Without -funroll-loops        slightly *faster*
+  Without -march=prescott       75% slower
+  Without -O2                   60% slower
 
