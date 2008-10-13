@@ -1,0 +1,10 @@
+
+Performance impact of various GCC optimisation flags (tested with bilinear
+filtering enabled):
+
+Without -fomit-frame-pointer  slightly slower
+Without -ffast-math           about 35-40% slower
+Without -funroll-loops        slightly *faster*
+Without -march=prescott       75% slower
+Without -O2                   60% slower
+

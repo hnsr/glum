@@ -1,21 +1,10 @@
 
-# Examine some construction variables in env for debugging purposes
-#def print_vars(env):
-#    keys = ['AS', 'ASCOM', 'ASFLAGS', 'CC', 'CCFLAGS', 'CPPPATH', 'CPPDEFINES', 'LINKFLAGS', 'LIBS']
-#    dict = env.Dictionary()
-#    for key in keys:
-#        if key in dict:
-#            print "  " + key + ": " + repr(env[key])
-#        else:
-#            print "  " + key + ": (undefined)"
-
-
 # Set up global environment
 env_generic = Environment(tools = ['default', 'nasm'])
 
 # Pretty printing
 env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
-env_generic['ASCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
+env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
 env_generic['LINKCOMSTR'] = 'Linking $TARGET'
 
 # Setup LIBS/CCFLAGS for gtk/glade/gthread
@@ -32,15 +21,6 @@ env_generic.Append(LIBS = ['m', 'IL', 'ILU'])         # Additional libs
 env_generic.Append(LINKFLAGS = ['-rdynamic'])         # Needed by libglade
 env_generic.Append(CPPDEFINES = ['NO_ASM'])           # Disable assembly
 #env_generic.Append(CPPDEFINES = ['SKIP_GTK'])        # Skip drawing in GTK (benchmarking)
-
-
-# Impact of various GCC optimisation flags ont FPS with bilinear filtering enabled: 
-#
-# Without -fomit-frame-pointer 	slightly slower.
-# Without -ffast-math      		about 35-40% slower.
-# Without -funroll-loops   		slightly *faster*.
-# Without -march=prescott  		75% slower.
-# Without -O2			  		60% slower.
 
 
 # Customize for release build
