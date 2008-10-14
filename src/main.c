@@ -183,7 +183,11 @@ static void ui_init(void)
     GtkWidget *window_main;
 
     gxml = glade_xml_new("../data/glum.glade", NULL, NULL);
-    g_assert( NULL != gxml );
+
+    if ( NULL == gxml ) {
+        fprintf(stderr, "ERROR: Failed to load glum.glade\n");
+        exit(EXIT_FAILURE);
+    }
 
     glade_xml_signal_autoconnect(gxml);
 
