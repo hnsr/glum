@@ -5,26 +5,42 @@ warnings.simplefilter('ignore', DeprecationWarning)
 
 system = platform.system()
 machine = platform.machine()
+(bits, linkage) = platform.architecture()
 
+# Try to figure out machine architecture
 if machine in ['x86', 'i386', 'i686']:
     machine = 'x86'
 elif machine in ['x86_64']:
-    machine = 'x86_64'
+    pass
+# Sometimes Python on Windows returns an empty string, so as a last resort, just assume it's either
+# x86 or x86_64 and use platform.architecture() to figure out which it is...
+elif system == 'Windows':
+    if bits == '32bit':
+        machine = 'x86'
+    elif bits == '64bit':
+        machine = 'x86_64'
+    else:
+        print 'ERROR: platform.architecture() returned something unexpected (' + bits + \
+              '), fix arch detection'
+        Exit(1)
 else:
-    print 'Unknown platform.machine()'
-    Exit(1)
+    print 'WARNING: Unknown machine arch'
+    machine = 'unknown'
 
-# Set up global environment
+print 'System: ' + system + '  Machine: ' + machine
+
+# Set up generic environment
 if system == 'Windows':
-    env_generic = Environment(tools = ['default', 'mingw','nasm'])
-    # Assuming user has added nasm directory to PATH, I'll need to use external PATH to access it.
-    # (C:\MinGW\bin seems to be added to ['ENV]['PATH'] automatically, somehow)
+    env_generic = Environment(tools = ['mingw', 'nasm'])
+    # Require user to have a properly set up PATH so scons can find gcc/nasm
     env_generic['ENV']['PATH'] = os.environ.get('PATH')
 elif system == 'Linux':
+    # TODO: remove default, keep tools to the minimum needed
     env_generic = Environment(tools = ['default', 'nasm'])
 else:
-    print 'ERROR: Unknown operating system'
+    print 'ERROR: Unsupported operating system'
     Exit(1)
+
 
 # Pretty printing
 env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
@@ -42,13 +58,10 @@ if system == 'Windows':
                                   r'C:\MinGW\gtkstuff\include\gtk-2.0',
                                   r'C:\MinGW\gtkstuff\lib\gtk-2.0\include',
                                   r'C:\MinGW\gtkstuff\include\libglade-2.0'])
-
     env_generic.Append(LIBPATH = [r'C:\MinGW\devil\lib', 
                                   r'C:\MinGW\gtkstuff\lib'])
-
     env_generic.Append(LIBS = ['devil', 'ilu', 'glade-2.0', 'glib-2.0', 'gtk-win32-2.0',
                                'gobject-2.0', 'gdk-win32-2.0'])
-
     env_generic.Append(CCFLAGS = ['-mms-bitfields']) # Needed by gtk+ on Windows
     
     if machine == 'x86':
@@ -61,11 +74,12 @@ elif system == 'Linux':
     env_generic.ParseConfig("pkg-config libglade-2.0 --libs --cflags")
     env_generic.ParseConfig("pkg-config gthread-2.0 --libs --cflags")
     env_generic.Append(LINKFLAGS = ['-rdynamic']) # Needed by libglade
-    env_generic.Append(LIBS = ['IL', 'ILU']) # DevIL
+    env_generic.Append(LIBS = ['IL', 'ILU'])
     if machine == 'x86':
         env_generic.Append(ASFLAGS = ['-f elf32'])
     elif machine == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f elf64'])
+
 
 #env_generic.Append(CCFLAGS = ['-pg', '-fno-inline']) # Profiling
 env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
@@ -83,7 +97,7 @@ if machine != 'x86':
 env_release = env_generic.Clone()
 env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math'])
 # TODO: allow setting march through commandline options to scons?
-env_release.Append(CCFLAGS = ['-march=nocona'])
+#env_release.Append(CCFLAGS = ['-march=nocona'])
 
 
 # Customize for debug build
@@ -92,8 +106,6 @@ env_debug.Append(CCFLAGS = ['-g'])
 env_debug.Append(ASFLAGS = ['-g'])
 env_debug.Append(CPPDEFINES = ['DEBUG'])
 
-#print env_release.Dump()
-#Exit(0)
 
 env = env_release
 SConscript('src/SConscript', exports='env', variant_dir='build/release', duplicate=0)
