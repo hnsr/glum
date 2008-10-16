@@ -1,8 +1,12 @@
-Import('env')
+Import('env arch')
 
-asm_files = []
-if 'NO_ASM' not in env['CPPDEFINES']:
-    asm_files = Glob('*.asm')
-    
-glum = env.Program('glum', Glob('*.c') + asm_files)
+# Include assembly sources if NO_ASM wasn't defined
+if 'CPPDEFINES' not in env.Dictionary().keys() or 'NO_ASM' not in env['CPPDEFINES']:
+    asm_files = Glob('*.' + arch + '.asm')
+else:
+    asm_files = []
+
+c_files = Glob('*.c')
+
+glum = env.Program('glum', c_files + asm_files)
 

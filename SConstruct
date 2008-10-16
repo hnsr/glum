@@ -1,45 +1,23 @@
-import platform, warnings, os
+import util, warnings, os, sys
 
 # Ignore DeprecationWarnings to keep things readable (happens with scons 1.0.1 and Python 2.6)
 warnings.simplefilter('ignore', DeprecationWarning)
 
-system = platform.system()
-machine = platform.machine()
-(bits, linkage) = platform.architecture()
 
-# Try to figure out machine architecture
-if machine in ['x86', 'i386', 'i686']:
-    machine = 'x86'
-elif machine in ['x86_64']:
-    pass
-# Sometimes Python on Windows returns an empty string, so as a last resort, just assume it's either
-# x86 or x86_64 and use platform.architecture() to figure out which it is...
-elif system == 'Windows':
-    if bits == '32bit':
-        machine = 'x86'
-    elif bits == '64bit':
-        machine = 'x86_64'
-    else:
-        print 'ERROR: platform.architecture() returned something unexpected (' + bits + \
-              '), fix arch detection'
-        Exit(1)
-else:
-    print 'WARNING: Unknown machine arch'
-    machine = 'unknown'
+platform = util.get_platform()
+arch = util.get_arch()
 
-print 'System: ' + system + '  Machine: ' + machine
 
 # Set up generic environment
-if system == 'Windows':
+if platform == 'win32':
     env_generic = Environment(tools = ['mingw', 'nasm'])
     # Require user to have a properly set up PATH so scons can find gcc/nasm
     env_generic['ENV']['PATH'] = os.environ.get('PATH')
-elif system == 'Linux':
-    # TODO: remove default, keep tools to the minimum needed
-    env_generic = Environment(tools = ['default', 'nasm'])
 else:
-    print 'ERROR: Unsupported operating system'
-    Exit(1)
+    # Assume gcc etc are available but print a warning if the platform is unrecognised
+    env_generic = Environment(tools = ['gcc', 'gnulink', 'nasm'])
+    if platform not in ['linux', 'freebsd', 'darwin']:
+        print 'WARNING: Unrecognised platform (' + platform + '), assuming posix'
 
 
 # Pretty printing
@@ -47,8 +25,9 @@ env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
 env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
 env_generic['LINKCOMSTR'] = 'Linking $TARGET'
 
+
 # OS-specific setup
-if system == 'Windows':
+if platform == 'win32':
     env_generic.Append(CPPPATH = [r'C:\MinGW\devil\include',
                                   r'C:\MinGW\gtkstuff\include\atk-1.0',
                                   r'C:\MinGW\gtkstuff\include\cairo',
@@ -62,22 +41,26 @@ if system == 'Windows':
                                   r'C:\MinGW\gtkstuff\lib'])
     env_generic.Append(LIBS = ['devil', 'ilu', 'glade-2.0', 'glib-2.0', 'gtk-win32-2.0',
                                'gobject-2.0', 'gdk-win32-2.0'])
-    env_generic.Append(CCFLAGS = ['-mms-bitfields']) # Needed by gtk+ on Windows
+
+    # GTK+ on Windows needs this
+    env_generic.Append(CCFLAGS = ['-mms-bitfields'])
     
-    if machine == 'x86':
+    if arch == 'x86':
         env_generic.Append(ASFLAGS = ['-f win32'])
-    elif machine == 'x86_64':
+    elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f win64'])
 
-elif system == 'Linux':
+else:
     env_generic.ParseConfig("pkg-config gtk+-2.0 --libs --cflags")
     env_generic.ParseConfig("pkg-config libglade-2.0 --libs --cflags")
     env_generic.ParseConfig("pkg-config gthread-2.0 --libs --cflags")
-    env_generic.Append(LINKFLAGS = ['-rdynamic']) # Needed by libglade
+    # libglade needs this to connect UI callbacks
+    env_generic.Append(LINKFLAGS = ['-rdynamic'])
     env_generic.Append(LIBS = ['IL', 'ILU'])
-    if machine == 'x86':
+
+    if arch == 'x86':
         env_generic.Append(ASFLAGS = ['-f elf32'])
-    elif machine == 'x86_64':
+    elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f elf64'])
 
 
@@ -87,8 +70,7 @@ env_generic.Append(LIBS = ['m'])                # Additional libs
 #env_generic.Append(CPPDEFINES = ['SKIP_GTK'])  # Skip drawing in GTK (benchmarking)
 
 # Only enable assembly on x86
-env_generic['CPPDEFINES'] = []
-if machine != 'x86':
+if arch not in ['x86']:
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
 
 
@@ -108,8 +90,8 @@ env_debug.Append(CPPDEFINES = ['DEBUG'])
 
 
 env = env_release
-SConscript('src/SConscript', exports='env', variant_dir='build/release', duplicate=0)
+SConscript('src/SConscript', exports='env arch', variant_dir='build/release', duplicate=0)
 
 env = env_debug
-SConscript('src/SConscript', exports='env', variant_dir='build/debug', duplicate=0)
+SConscript('src/SConscript', exports='env arch', variant_dir='build/debug', duplicate=0)
 
