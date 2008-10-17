@@ -3,7 +3,6 @@ import util, warnings, os, sys
 # Ignore DeprecationWarnings to keep things readable (happens with scons 1.0.1 and Python 2.6)
 warnings.simplefilter('ignore', DeprecationWarning)
 
-
 platform = util.get_platform()
 arch = util.get_arch()
 
@@ -17,7 +16,7 @@ else:
     # Assume gcc etc are available but print a warning if the platform is unrecognised
     env_generic = Environment(tools = ['gcc', 'gnulink', 'nasm'])
     if platform not in ['linux', 'freebsd', 'darwin']:
-        print 'WARNING: Unrecognised platform (' + platform + '), assuming posix'
+        print 'WARNING: Unrecognised platform (' + platform + ')'
 
 
 # Pretty printing
@@ -63,23 +62,20 @@ else:
     elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f elf64'])
 
-
 #env_generic.Append(CCFLAGS = ['-pg', '-fno-inline']) # Profiling
 env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
-env_generic.Append(LIBS = ['m'])                # Additional libs
-#env_generic.Append(CPPDEFINES = ['SKIP_GTK'])  # Skip drawing in GTK (benchmarking)
+#env_generic.Append(CPPDEFINES = ['SKIP_GTK']) # Skip drawing in GTK (benchmarking)
 
 # Only enable assembly on x86
-if arch not in ['x86']:
+if arch not in ['x86', 'x86_64']:
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
-
 
 
 # Customize for release build
 env_release = env_generic.Clone()
 env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math'])
 # TODO: allow setting march through commandline options to scons?
-#env_release.Append(CCFLAGS = ['-march=nocona'])
+#env_release.Append(CCFLAGS = ['-march=core2'])
 
 
 # Customize for debug build

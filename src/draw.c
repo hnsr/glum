@@ -646,7 +646,7 @@ void glum_clear(Context *context)
         fb[i++] = context->clear_color;
     }
 #else
-    // Not much faster if compiler unrolls above loop
+    // Not much faster (but measurable on amd64 with a core2duo) if compiler unrolls above loop
     glum_clear_asm(fb, pixels, context->clear_color);
 #endif
 
