@@ -1,3 +1,5 @@
+; TODO: Calling conventions on win64 are different, this probably won't work
+
 segment .data
 
 segment .bss
