@@ -45,4 +45,22 @@ def get_arch():
 
     return arch
 
+# See if var is 'defined'. Returns true if var is a non-empty string that does not equal '0', or a
+# non-zero integer. Used for easily checking for variables passed on the scons commandline that are
+# used for CPPDEFINES.
+def is_defined(var):
 
+    # Just return false if there's an exception raised.
+    try:
+        if type(var) == int:
+            if var != 0:
+                return True
+        elif type(var) == str:
+            if var not in ['', '0']:
+                return True
+        else:
+            return False
+    except:
+        pass
+
+    return False

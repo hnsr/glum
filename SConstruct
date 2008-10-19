@@ -6,55 +6,63 @@ warnings.simplefilter('ignore', DeprecationWarning)
 platform = util.get_platform()
 arch = util.get_arch()
 
+# Build variable stuff
+vars = Variables('build.conf')
+vars.Add('MARCH', 'Sets the -march gcc optimization flag', '')
+vars.Add('PROFILING', 'If set to 1, adds profiling information to both debug/release executables',0)
+vars.Add('SKIP_GTK', 'If set to 1, skips drawing framebuffer to GTK drawingarea for benchmarking'\
+    ' purposes', 0)
+vars.Add('WIN_GTK_PATH', 'Should be set to the path where the GTK+ headers/libs reside on Windows',
+    'C:\\MinGW\\gtkstuff')
+vars.Add('WIN_DEVIL_PATH', 'Should be set to the path where the DevIL headers/libs reside on '\
+    'Windows', 'C:\\MinGW\\devil')
+vars.Add('WIN_PATH', 'Semicolon-seperated paths in which scons looks for the gcc, nasm executables',
+    'C:\\MinGW\\bin;C:\\Program Files\\nasm')
+
 
 # Set up generic environment
 if platform == 'win32':
-    env_generic = Environment(tools = ['mingw', 'nasm'])
-    # Require user to have a properly set up PATH so scons can find gcc/nasm
-    env_generic['ENV']['PATH'] = os.environ.get('PATH')
-else:
-    # Assume gcc etc are available but print a warning if the platform is unrecognised
-    env_generic = Environment(tools = ['gcc', 'gnulink', 'nasm'])
-    if platform not in ['linux', 'freebsd', 'darwin']:
-        print 'WARNING: Unrecognised platform (' + platform + ')'
+    env_generic = Environment(variables = vars, tools = ['mingw', 'nasm'])
 
-
-# Pretty printing
-env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
-env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
-env_generic['LINKCOMSTR'] = 'Linking $TARGET'
-
-
-# OS-specific setup
-if platform == 'win32':
-    env_generic.Append(CPPPATH = [r'C:\MinGW\devil\include',
-                                  r'C:\MinGW\gtkstuff\include\atk-1.0',
-                                  r'C:\MinGW\gtkstuff\include\cairo',
-                                  r'C:\MinGW\gtkstuff\include\pango-1.0',
-                                  r'C:\MinGW\gtkstuff\include\glib-2.0',
-                                  r'C:\MinGW\gtkstuff\lib\glib-2.0\include',
-                                  r'C:\MinGW\gtkstuff\include\gtk-2.0',
-                                  r'C:\MinGW\gtkstuff\lib\gtk-2.0\include',
-                                  r'C:\MinGW\gtkstuff\include\libglade-2.0'])
-    env_generic.Append(LIBPATH = [r'C:\MinGW\devil\lib', 
-                                  r'C:\MinGW\gtkstuff\lib'])
+    env_generic['ENV']['PATH'] = env_generic['WIN_PATH']
+    gtk_path = env_generic['WIN_GTK_PATH']
+    devil_path = env_generic['WIN_DEVIL_PATH']
+    env_generic.Append(CPPPATH = [devil_path + '\include',
+                                  gtk_path + '\\include\\atk-1.0',
+                                  gtk_path + '\\include\\cairo',
+                                  gtk_path + '\\include\\pango-1.0',
+                                  gtk_path + '\\include\\glib-2.0',
+                                  gtk_path + '\\lib\\glib-2.0\\include',
+                                  gtk_path + '\\include\\gtk-2.0',
+                                  gtk_path + '\\lib\\gtk-2.0\\include',
+                                  gtk_path + '\\include\\libglade-2.0'])
+    env_generic.Append(LIBPATH = [devil_path + '\\lib', 
+                                  gtk_path + '\\lib'])
     env_generic.Append(LIBS = ['devil', 'ilu', 'glade-2.0', 'glib-2.0', 'gtk-win32-2.0',
                                'gobject-2.0', 'gdk-win32-2.0'])
 
     # GTK+ on Windows needs this
     env_generic.Append(CCFLAGS = ['-mms-bitfields'])
-    
+
     if arch == 'x86':
         env_generic.Append(ASFLAGS = ['-f win32'])
     elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f win64'])
 
 else:
+    # Assume gcc etc are available but print a warning if the platform is unrecognised
+    if platform not in ['linux', 'freebsd', 'darwin']:
+        print 'WARNING: Unrecognised platform (' + platform + ')'
+
+    env_generic = Environment(variables = vars, tools = ['gcc', 'gnulink', 'nasm'])
+
     env_generic.ParseConfig("pkg-config gtk+-2.0 --libs --cflags")
     env_generic.ParseConfig("pkg-config libglade-2.0 --libs --cflags")
     env_generic.ParseConfig("pkg-config gthread-2.0 --libs --cflags")
+
     # libglade needs this to connect UI callbacks
     env_generic.Append(LINKFLAGS = ['-rdynamic'])
+
     env_generic.Append(LIBS = ['IL', 'ILU'])
 
     if arch == 'x86':
@@ -62,11 +70,21 @@ else:
     elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f elf64'])
 
-#env_generic.Append(CCFLAGS = ['-pg', '-fno-inline']) # Profiling
-env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
-#env_generic.Append(CPPDEFINES = ['SKIP_GTK']) # Skip drawing in GTK (benchmarking)
+Help(vars.GenerateHelpText(env_generic))
 
-# Only enable assembly on x86
+env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
+env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
+env_generic['LINKCOMSTR'] = 'Linking $TARGET'
+
+if util.is_defined(env_generic['PROFILING']):
+    env_generic.Append(CCFLAGS = ['-pg', '-fno-inline'])
+
+env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
+
+# Skip drawing in GTK (benchmarking) if requested
+env_generic.Append(CPPDEFINES = ['SKIP_GTK'] if util.is_defined(env_generic['SKIP_GTK']) else [] )
+
+# Only enable assembly on x86 and x86_64
 if arch not in ['x86', 'x86_64']:
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
 
@@ -74,8 +92,7 @@ if arch not in ['x86', 'x86_64']:
 # Customize for release build
 env_release = env_generic.Clone()
 env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math'])
-# TODO: allow setting march through commandline options to scons?
-#env_release.Append(CCFLAGS = ['-march=core2'])
+env_release.Append(CCFLAGS = '-march=$MARCH' if str(env_release['MARCH']) else [] )
 
 
 # Customize for debug build
