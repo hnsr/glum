@@ -1,4 +1,4 @@
-import util, warnings, os, sys
+import util, warnings
 
 # Ignore DeprecationWarnings to keep things readable (happens with scons 1.0.1 and Python 2.6)
 warnings.simplefilter('ignore', DeprecationWarning)
@@ -12,6 +12,7 @@ vars.Add('MARCH', 'Sets the -march gcc optimization flag', '')
 vars.Add('PROFILING', 'If set to 1, adds profiling information to both debug/release executables',0)
 vars.Add('SKIP_GTK', 'If set to 1, skips drawing framebuffer to GTK drawingarea for benchmarking'\
     ' purposes', 0)
+vars.Add('VERBOSE', 'If set to 1, the full compilation commands will be shown',0)
 vars.Add('WIN_GTK_PATH', 'Should be set to the path where the GTK+ headers/libs reside on Windows',
     'C:\\MinGW\\gtkstuff')
 vars.Add('WIN_DEVIL_PATH', 'Should be set to the path where the DevIL headers/libs reside on '\
@@ -70,29 +71,32 @@ else:
     elif arch == 'x86_64':
         env_generic.Append(ASFLAGS = ['-f elf64'])
 
-Help(vars.GenerateHelpText(env_generic))
+env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
 
-env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
-env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
-env_generic['LINKCOMSTR'] = 'Linking $TARGET'
+if not util.is_defined(env_generic['VERBOSE']):
+    env_generic['CCCOMSTR'] = 'Compiling $SOURCE -> $TARGET'
+    env_generic['ASCOMSTR'] = 'Assembling $SOURCE -> $TARGET'
+    env_generic['LINKCOMSTR'] = 'Linking $TARGET'
 
 if util.is_defined(env_generic['PROFILING']):
     env_generic.Append(CCFLAGS = ['-pg', '-fno-inline'])
 
-env_generic.Append(CCFLAGS = ['-Wall', '-std=c99'])
-
-# Skip drawing in GTK (benchmarking) if requested
-env_generic.Append(CPPDEFINES = ['SKIP_GTK'] if util.is_defined(env_generic['SKIP_GTK']) else [] )
+# Skip copying image to GTK+ drawingarea (for benchmarking) if requested
+if util.is_defined(env_generic['SKIP_GTK']):
+    env_generic.Append(CPPDEFINES = ['SKIP_GTK'])
 
 # Only enable assembly on x86 and x86_64
 if arch not in ['x86', 'x86_64']:
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
 
 
+Help(vars.GenerateHelpText(env_generic))
+
+
 # Customize for release build
 env_release = env_generic.Clone()
 env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math'])
-env_release.Append(CCFLAGS = '-march=$MARCH' if str(env_release['MARCH']) else [] )
+env_release.Append(CCFLAGS = ['-march=$MARCH'] if str(env_release['MARCH']) else [] )
 
 
 # Customize for debug build
