@@ -12,6 +12,7 @@ vars.Add('MARCH', 'Sets the -march gcc optimization flag', '')
 vars.Add('PROFILING', 'If set to 1, adds profiling information to both debug/release executables',0)
 vars.Add('SKIP_GTK', 'If set to 1, skips drawing framebuffer to GTK drawingarea for benchmarking'\
     ' purposes', 0)
+vars.Add('NO_ASM', 'If set to 1, no assembly files will be built', 0)
 vars.Add('VERBOSE', 'If set to 1, the full compilation commands will be shown',0)
 vars.Add('WIN_GTK_PATH', 'Should be set to the path where the GTK+ headers/libs reside on Windows',
     'C:\\MinGW\\gtkstuff')
@@ -86,8 +87,8 @@ if util.is_defined(env_generic['PROFILING']):
 if util.is_defined(env_generic['SKIP_GTK']):
     env_generic.Append(CPPDEFINES = ['SKIP_GTK'])
 
-# Only enable assembly on x86 and x86_64
-if arch not in ['x86', 'x86_64']:
+# Only enable assembly on x86 and x86_64 and if NO_ASM wasn't defined
+if arch not in ['x86', 'x86_64'] or util.is_defined(env_generic['NO_ASM']):
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
 
 
