@@ -1,7 +1,7 @@
 
 Compiling on *nix:
 
-  - Install Python, SCons, nasm, GTK+, libglade, DevIL.
+  - Install required deps: pkg-config, python, scons, nasm, gtk+, libglade, devil.
   - In the directory holding the sources, run 'scons' to compile Glum.
 
 
@@ -54,6 +54,24 @@ Tested versions:
   GTK+:     2.14.3      ?
 
 
+
+Build customization:
+
+  Run 'scons -h' to get a list of variables that can be set to influence building options.
+
+  Use them either as arguments to scons (i.e: 'scons PROFILING=1') or add them to 'build.conf':
+
+    MARCH = 'pentium3'
+    VERBOSE = '1'
+    PROFILING = '1'
+
+
+Profiling:
+
+  Build with PROFILING=1, run the executable which will output gmon.out containing profiling
+  information, then run 'gprof <path-to-glum-executable'.
+  
+
 Note to self: Performance impact of various GCC optimisation flags on x86 (tested with bilinear
 filtering enabled):
 
@@ -62,4 +80,5 @@ filtering enabled):
   Without -funroll-loops        slightly *faster*
   Without -march=prescott       75% slower
   Without -O2                   60% slower
+
 
