@@ -51,6 +51,8 @@
     "ense along with this program; if not, write to the Free Software Foundation, Inc., 51 Frankli"\
     "n Street, Fifth Floor, Boston, MA 02110-1301, USA."
 
+// Exit after TIME_LIMIT seconds have passed, useful for benchmarking/profiling.
+#define TIME_LIMIT 20.0
 
 #define DEFAULT_PERSPECTIVE_NEAR    0.1f
 #define DEFAULT_PERSPECTIVE_FAR     100.0f
@@ -64,13 +66,14 @@
 #define DEFAULT_CAM_Z           0.55f
 */
 
+/*
 #define DEFAULT_FOV             90.0f
 #define DEFAULT_CAM_PITCH       0.069755f
 #define DEFAULT_CAM_YAW         0.069651f
 #define DEFAULT_CAM_X           0.503065f
 #define DEFAULT_CAM_Y           0.418891f
 #define DEFAULT_CAM_Z           0.593934f
-
+*/
 
 /*
 // Oblique triangle angle; many but short scans
@@ -82,7 +85,7 @@
 #define DEFAULT_CAM_Z           0.505290f
 */
 
-/*
+
 // Triangle fills viewport
 #define DEFAULT_FOV             59.0f
 #define DEFAULT_CAM_PITCH       0.153140f
@@ -90,7 +93,7 @@
 #define DEFAULT_CAM_X           0.762409f
 #define DEFAULT_CAM_Y           0.390223f
 #define DEFAULT_CAM_Z           0.454588f
-*/
+
 
 GladeXML *gxml;
 Context *context;
@@ -195,7 +198,8 @@ static void ui_init(void)
     drawingarea_image = glade_xml_get_widget(gxml, "drawingarea_image");
     g_assert( NULL != drawingarea_image );
     
-    // Alreayd rendering to an offscreen buffer so don't need GTK+'s double buffering.
+    // Already rendering to an offscreen buffer so don't need GTK+'s double buffering (disabling it
+    // gives a decent speed up).
     gtk_widget_set_double_buffered(drawingarea_image, FALSE);
 
     // Set window title.
@@ -452,7 +456,7 @@ int main(int argc, char **argv)
 {
     GTimer *timer;
     int frame_count = 0;
-    gdouble tlast = 0.0, tnow, tdelta;
+    gdouble tlast = 0.0, tnow = 0.0, tdelta;
     //gint mouse_x, mouse_y;
 
     // Catch SIGINT so we get a chance to display FPS before exiting.
@@ -511,6 +515,10 @@ int main(int argc, char **argv)
 
         // Run GTK+ events (non-blocking).
         while (gtk_events_pending()) gtk_main_iteration_do(FALSE);
+
+#ifdef TIME_LIMIT
+            if (tnow >= TIME_LIMIT) exiting = 1;
+#endif
 
         if (exiting) {
             printf("Exiting.\n");
