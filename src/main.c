@@ -52,7 +52,7 @@
     "n Street, Fifth Floor, Boston, MA 02110-1301, USA."
 
 // Exit after TIME_LIMIT seconds have passed, useful for benchmarking/profiling.
-#define TIME_LIMIT 20.0
+#define TIME_LIMIT 16.0
 
 #define DEFAULT_PERSPECTIVE_NEAR    0.1f
 #define DEFAULT_PERSPECTIVE_FAR     100.0f
