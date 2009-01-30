@@ -73,7 +73,7 @@ Context *glum_context_new(unsigned int width, unsigned int height)
     new->viewport_width = width;
     new->viewport_height = height;
 
-    new->fill_mode = GLUM_FILLMODE_TEXBILINEAR;
+    new->fill_mode = GLUM_FILLMODE_TEXNEAREST;
 
     new->draw_color = DEFAULT_DRAW_COLOR;
     new->clear_color = DEFAULT_CLEAR_COLOR;
