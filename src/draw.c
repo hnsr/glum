@@ -112,12 +112,12 @@ static inline unsigned int get_texel_nearest(Texture *texture, float u, float v)
     
     // Optimised power-of-two modulus, 50% faster than normal modulus and only marginally slower
     // than no modulus at all. The unsigned int mask with a signed integer seems to work because
-    // of two's complement.
-    // TODO: Optimise floor/cast.
+    // of two's complement (consider that u/v coords can be negative)
+    // TODO: Optimise floor/cast (removing the floor doubles FPS).
     x = ( (int) floorf(u * texture->width_f) ) & texture->width_mod_mask;
     y = ( (int) floorf(v * texture->height_f) ) & texture->height_mod_mask;
 
-    return *(((unsigned int *)texture->image) + y*texture->width + x);
+    return ((unsigned int *)texture->image)[y*texture->width + x];
 }
 
 
