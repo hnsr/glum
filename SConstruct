@@ -87,8 +87,11 @@ if util.is_defined(env_generic['PROFILING']):
 if util.is_defined(env_generic['SKIP_GTK']):
     env_generic.Append(CPPDEFINES = ['SKIP_GTK'])
 
-# Only enable assembly on x86 and x86_64 and if NO_ASM wasn't defined
-if arch not in ['x86', 'x86_64'] or util.is_defined(env_generic['NO_ASM']):
+# Force NO_ASM if arch is not supported.
+if arch not in ['x86','x86_64']:
+    env_generic['NO_ASM'] = 1
+
+if util.is_defined(env_generic['NO_ASM']):
     env_generic.Append(CPPDEFINES = ['NO_ASM'])
 
 
@@ -114,8 +117,8 @@ env_debug.Append(CPPDEFINES = ['DEBUG'])
 
 
 env = env_release
-SConscript('src/SConscript', exports='env arch', variant_dir='build/release', duplicate=0)
+SConscript('src/SConscript', exports='env arch util', variant_dir='build/release', duplicate=0)
 
 env = env_debug
-SConscript('src/SConscript', exports='env arch', variant_dir='build/debug', duplicate=0)
+SConscript('src/SConscript', exports='env arch util', variant_dir='build/debug', duplicate=0)
 

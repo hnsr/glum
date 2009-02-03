@@ -1,7 +1,8 @@
-Import('env arch')
+Import('env arch util')
 
 # Include assembly sources if NO_ASM wasn't defined
-if 'CPPDEFINES' not in env.Dictionary().keys() or 'NO_ASM' not in env['CPPDEFINES']:
+#if 'CPPDEFINES' not in env.Dictionary().keys() or 'NO_ASM' not in env['CPPDEFINES']:
+if not util.is_defined(env['NO_ASM']):
     asm_files = Glob('*.' + arch + '.asm')
 else:
     asm_files = []
