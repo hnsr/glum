@@ -387,7 +387,7 @@ static void draw_scan(Context *context, Triangle *triangle, Edge *left, Edge *ri
         left_x = 0.0f;
     }
     if (right_x > ((float) context->viewport_width)) right_x = (float) context->viewport_width;
-    if (left->y > ((int)context->viewport_height-1)) return;
+    if (left->y > ((int) context->viewport_height-1)) return;
     if (left->y < 0) return;
 
     start = (int) ceilf(left_x);
@@ -456,7 +456,7 @@ static void draw_scan(Context *context, Triangle *triangle, Edge *left, Edge *ri
 
 
 // Steps down an edge in screens-space (y=y+1), updating x and interpolants accordingly.
-static void edge_step(Edge *edge)
+static inline void edge_step(Edge *edge)
 {
     edge->x += edge->x_step;
     edge->y++;
