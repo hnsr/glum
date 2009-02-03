@@ -81,4 +81,7 @@ filtering enabled):
   Without -march=prescott       75% slower
   Without -O2                   60% slower
 
+Tested on p3 laptop with texnearest:
+  With -mfpmath=387,see     50-60% faster
+
 

@@ -99,9 +99,9 @@ Help(vars.GenerateHelpText(env_generic))
 env_release = env_generic.Clone()
 # Don't add omit-frame-pointer when profiling
 if util.is_defined(env_generic['PROFILING']):
-    env_release.Append(CCFLAGS = ['-O2', '-ffast-math'])
+    env_release.Append(CCFLAGS = ['-O2', '-ffast-math', '-mfpmath=387,sse'])
 else:
-    env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math'])
+    env_release.Append(CCFLAGS = ['-O2', '-fomit-frame-pointer', '-ffast-math', '-mfpmath=387,sse'])
 
 env_release.Append(CCFLAGS = ['-march=$MARCH'] if str(env_release['MARCH']) else [] )
 
