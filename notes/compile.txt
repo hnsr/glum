@@ -6,32 +6,41 @@ Compiling on *nix:
 
 
 Compiling on Windows:
-  
-  On Windows MinGW and nasm are used for compilation, SCons (python-based build system) for
-  building.
 
-  - Install MinGW, nasm, Python
+  On Windows, MinGW and nasm are used for compilation/assembling, and SCons (python-based build
+  system) for building.
 
-  - Install SCons (its setup program should pick the right install location, which should be
-    somewhere under the Python installation directory)
+  - Install MinGW (use the 'Automated MinGW Installer' package if unsure), nasm, and Python.
 
-  - To make SCons easily invocable from the command shell, add the Python installation directory and
-    its Scripts subdirectory to Windows' PATH
+    Glum's build script will automatically add 'C:\MinGW\bin' and 'C:\Program Files\nasm' to the
+    PATH. If MinGW and nasm were installed somewhere else, you need to specify the right paths in
+    the WIN_PATH setting in the build.conf configuration file (see output of 'scons -h' for more
+    info).
 
-  - Download headers and libs for required libraries (DevIL, GTK+, libglade) from 
-    http://www.aphax.nl/files/glum-mingw-deps.zip
+  - Install SCons. Its setup program should pick the right install location, which should be
+    somewhere under the Python installation directory.
 
-  - Download required run-time DLLS from  http://www.aphax.nl/files/glum-runtime-dlls.zip
+    To make SCons easily invocable from the command line, add both the Python installation
+    directory (i.e. C:\Python26\) and also the Scripts subdirectory (C:\Python26\Scripts\) to the
+    PATH environment variable. (Right-click My Computer, Properties, Advanced tab, click Environment
+    Variables).
 
-  - Set up the paths for headers/libs and WIN_PATH in build.conf (see output of 'scons -h' for
-    examples)
+  - Download headers and libs for required dependencies (DevIL, GTK+, libglade). For convenience,
+    I've created a zip archive with everything required which can be downloaded from
+    http://www.aphax.nl/files/glum-mingw-deps.zip .
+    
+    If the 'devil' and 'gtkstuff' directories are extracted under 'C:\MinGW' no further setup is
+    required since the glum build script looks for them under that directory by default. If they are
+    extracted somewhere else of if the headers/libs are installed by yourself, make sure to set the
+    paths correctly in build.conf.
 
-  - Open a command shell, change into the Glum source directory and run 'scons' to compile.
+  - Open a command shell, change into the Glum source directory and run 'scons' to compile. Both a
+    release and debug executable will be built under the 'build' subdirectory.
+
+  - Download and extract required run-time DLLS from http://www.aphax.nl/files/glum-runtime-dlls.zip
 
   - Copy the built executable from build/release or build/debug into the directory where the runtime
     DLLS were extracted.
-
-  TODO: Add something about the data directory..
 
 
 Notes on DevIL on Windows:
