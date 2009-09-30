@@ -1,5 +1,5 @@
 import util, warnings
-# Bogus edit
+
 # Ignore DeprecationWarnings to keep things readable (happens with scons 1.0.1 and Python 2.6)
 warnings.simplefilter('ignore', DeprecationWarning)
 
