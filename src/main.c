@@ -161,6 +161,8 @@ static void draw_scene(gdouble tdelta)
 /* Initialize rendering context. */
 static void context_init(int width, int height)
 {
+    if (context) return;
+
     context = glum_context_new(width, height);
     
     textures[0] = glum_texture_from_file("../data/border.png");
@@ -229,6 +231,9 @@ void sigint_handler(int sig)
 // UI callbacks
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME: map callback isn't called anymore and I don't know why, should probably figure that out if
+// I ever want to do anything with this code again. I put some workarounds in the expose/draw CBs
+// and initialize the context from there
 GLADE_CB gboolean drawingarea_image_map_event_cb(GtkWidget *widget, GdkEvent *event,
     gpointer user_data)
 {
@@ -415,6 +420,9 @@ GLADE_CB void drawingarea_image_expose_event_cb(GtkWidget *widget, GdkEventExpos
 #ifndef SKIP_GTK
     static GdkGC *gc = NULL;
     
+    context_init(widget->allocation.width, widget->allocation.height);
+    viewport_mapped = 1;
+
     if (gc == NULL) {
         gc = gdk_gc_new(widget->window);
     }
@@ -429,6 +437,9 @@ GLADE_CB void drawingarea_image_expose_event_cb(GtkWidget *widget, GdkEventExpos
 GLADE_CB gboolean drawingarea_image_configure_event_cb(GtkWidget *widget, GdkEventConfigure *event,
                                                        gpointer user_data)
 {
+    context_init(widget->allocation.width, widget->allocation.height);
+    viewport_mapped = 1;
+
     glum_context_resize(context, event->width, event->height);
 
     aspect_ratio = (float) event->width / (float) event->height;
