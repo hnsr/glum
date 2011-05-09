@@ -14,7 +14,7 @@ _glum_clear_asm:
 
     push    edi         ; preserve caller's edi
 
-; [ebp] == caller's ebp 
+; [ebp] == caller's ebp
 ; [ebp+4] == return address
 ; [ebp+8] == fb
 ; [ebp+12] == pixels

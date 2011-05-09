@@ -164,7 +164,7 @@ static void context_init(int width, int height)
     if (context) return;
 
     context = glum_context_new(width, height);
-    
+
     textures[0] = glum_texture_from_file("../data/border.png");
     textures[1] = glum_texture_from_file("../data/grid.png");
     textures[2] = glum_texture_from_file("../data/gras.jpg");
@@ -199,7 +199,7 @@ static void ui_init(void)
     // Get handle to image drawingarea and match its size request to the current image size.
     drawingarea_image = glade_xml_get_widget(gxml, "drawingarea_image");
     g_assert( NULL != drawingarea_image );
-    
+
     // Already rendering to an offscreen buffer so don't need GTK+'s double buffering (disabling it
     // gives a decent speed up).
     gtk_widget_set_double_buffered(drawingarea_image, FALSE);
@@ -268,7 +268,7 @@ GLADE_CB gboolean window_main_key_press_event_cb(GtkWidget *widget, GdkEventKey 
                                                  gpointer user_data)
 {
     switch(event->keyval) {
-        
+
         case GDK_y:
             if (context->fill_mode == GLUM_FILLMODE_TEXBILINEAR) {
                 context->fill_mode = GLUM_FILLMODE_TEXNEAREST;
@@ -367,7 +367,7 @@ GLADE_CB gboolean window_main_key_release_event_cb(GtkWidget *widget, GdkEventKe
                                                    gpointer user_data)
 {
     switch(event->keyval) {
-        
+
         case GDK_w:
             moving_forward = 0;
             break;
@@ -419,7 +419,7 @@ GLADE_CB void drawingarea_image_expose_event_cb(GtkWidget *widget, GdkEventExpos
 {
 #ifndef SKIP_GTK
     static GdkGC *gc = NULL;
-    
+
     context_init(widget->allocation.width, widget->allocation.height);
     viewport_mapped = 1;
 
@@ -496,7 +496,7 @@ int main(int argc, char **argv)
 
             if (moving_forward)
                 glum_camera_move(camera, GLUM_FORWARD, GLUM_CAMERA_RELATIVE, move_speed*tdelta);
-            if (moving_back) 
+            if (moving_back)
                 glum_camera_move(camera, GLUM_BACK, GLUM_CAMERA_RELATIVE, move_speed*tdelta);
             if (moving_left)
                 glum_camera_move(camera, GLUM_LEFT, GLUM_CAMERA_RELATIVE, move_speed*tdelta);
@@ -510,7 +510,7 @@ int main(int argc, char **argv)
                 glum_camera_turn(camera, GLUM_LEFT, turn_speed*tdelta);
             if (turning_right)
                 glum_camera_turn(camera, GLUM_RIGHT, turn_speed*tdelta);
-            if (turning_up) 
+            if (turning_up)
                 glum_camera_turn(camera, GLUM_UP, turn_speed*tdelta);
             if (turning_down)
                 glum_camera_turn(camera, GLUM_DOWN, turn_speed*tdelta);

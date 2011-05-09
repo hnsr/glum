@@ -46,7 +46,7 @@ _glum_clear_asm2:
     shr     ecx, 1
 
     mov     eax, edx ; copy color into lower 32bits of rax
-    shl     eax, 32  ; move them to the upper 32bits, 
+    shl     eax, 32  ; move them to the upper 32bits,
     add     rax, rdx ; add color to it to fill the lower 32 bits
     rep stosq
 

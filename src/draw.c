@@ -109,7 +109,7 @@ static inline unsigned int pack_color(float r, float g, float b, float a)
 static inline unsigned int get_texel_nearest(Texture *texture, float u, float v)
 {
     int x, y;
-    
+
     // Optimised power-of-two modulus, 50% faster than normal modulus and only marginally slower
     // than no modulus at all. The unsigned int mask with a signed integer seems to work because
     // of two's complement (consider that u/v coords can be negative)
@@ -125,7 +125,7 @@ static inline unsigned int get_texel_nearest(Texture *texture, float u, float v)
 static inline void get_texels_bilinear(Texture *texture, unsigned int *samples, float u, float v)
 {
     int x, y, x1, y1;
-    
+
     x = ((int) u) & texture->width_mod_mask;
     y = ((int) v) & texture->height_mod_mask;
     x1 = (x+1) & texture->width_mod_mask;
@@ -170,7 +170,7 @@ static inline void lerp_colors(unsigned int scale, unsigned int *dst, unsigned i
 
     tmp_ag = ((src_ag - dst_ag) * scale) >> 8;
     tmp_br = ((src_br - dst_br) * scale) >> 8;
-    
+
     tmp_ag = ((tmp_ag + dst_ag) << 8) & 0xFF00FF00;
     tmp_br = (tmp_br + dst_br) & 0x00FF00FF;
 
@@ -413,7 +413,7 @@ static void draw_scan(Context *context, Triangle *triangle, Edge *left, Edge *ri
         // TODO: This code duplication is a bit inconvenient, but using a function pointer for
         // get_texel is too costly and the overhead of branching around get_texel is too big...
         if (context->fill_mode == GLUM_FILLMODE_TEXBILINEAR) {
-            
+
             while (count--) {
 
                 z = 1.0f/zi;
@@ -570,7 +570,7 @@ static void calculate_gradients(Triangle *t)
     t->dvz_dx = dxi * ( (t->vz[1] - t->vz[2]) * (y0_min_y2) -
                         (t->vz[0] - t->vz[2]) * (y1_min_y2) );
 
-    
+
     t->dzi_dy = dyi * ( (t->zi[1] - t->zi[2]) * (x0_min_x2) -
                         (t->zi[0] - t->zi[2]) * (x1_min_x2) );
 
@@ -580,7 +580,7 @@ static void calculate_gradients(Triangle *t)
     t->dvz_dy = dyi * ( (t->vz[1] - t->vz[2]) * (x0_min_x2) -
                         (t->vz[0] - t->vz[2]) * (x1_min_x2) );
 
-    
+
     t->dcz_dx[0] = dxi * ( (t->cz[1][0] - t->cz[2][0]) * (y0_min_y2) -
                            (t->cz[0][0] - t->cz[2][0]) * (y1_min_y2) );
 
@@ -593,7 +593,7 @@ static void calculate_gradients(Triangle *t)
     t->dcz_dx[3] = dxi * ( (t->cz[1][3] - t->cz[2][3]) * (y0_min_y2) -
                            (t->cz[0][3] - t->cz[2][3]) * (y1_min_y2) );
 
-    
+
     t->dcz_dy[0] = dyi * ( (t->cz[1][0] - t->cz[2][0]) * (x0_min_x2) -
                            (t->cz[0][0] - t->cz[2][0]) * (x1_min_x2) );
 
@@ -602,7 +602,7 @@ static void calculate_gradients(Triangle *t)
 
     t->dcz_dy[2] = dyi * ( (t->cz[1][2] - t->cz[2][2]) * (x0_min_x2) -
                            (t->cz[0][2] - t->cz[2][2]) * (x1_min_x2) );
-    
+
     t->dcz_dy[3] = dyi * ( (t->cz[1][3] - t->cz[2][3]) * (x0_min_x2) -
                            (t->cz[0][3] - t->cz[2][3]) * (x1_min_x2) );
 }
@@ -662,7 +662,7 @@ void glum_draw_triangle(Context *context, float *triangle)
     memcpy(t.coords, triangle, sizeof(float)*3);
     memcpy(t.coords[1], &(triangle[3]), sizeof(float)*3);
     memcpy(t.coords[2], &(triangle[6]), sizeof(float)*3);
-    
+
     memcpy(t.uv_coords, &(triangle[9]), sizeof(float)*2);
     memcpy(t.uv_coords[1], &(triangle[11]), sizeof(float)*2);
     memcpy(t.uv_coords[2], &(triangle[13]), sizeof(float)*2);
@@ -671,7 +671,7 @@ void glum_draw_triangle(Context *context, float *triangle)
     t.coords[1][3] = 1.0f;
     t.coords[2][3] = 1.0f;
 
-    
+
     // Transform by modelview matrix -> view-space
     math_transform_v4(context->modelview[context->modelview_stackpos], t.coords[0]);
     math_transform_v4(context->modelview[context->modelview_stackpos], t.coords[1]);
@@ -700,7 +700,7 @@ void glum_draw_triangle(Context *context, float *triangle)
     math_transform_v4(context->projection[context->projection_stackpos], t.coords[2]);
 
 
-    // Culling/Clipping by frustrum planes 
+    // Culling/Clipping by frustrum planes
     // TODO
 
 
@@ -709,7 +709,7 @@ void glum_draw_triangle(Context *context, float *triangle)
         // Discard triangle, w <= 0.0001 for one or more vertices.
         return;
 
-    
+
     // Viewport transform -> screen-space
     math_transform_v4(context->viewport, t.coords[0]);
     math_transform_v4(context->viewport, t.coords[1]);

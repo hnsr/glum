@@ -38,7 +38,7 @@ if platform == 'win32':
                                   gtk_path + '\\include\\gtk-2.0',
                                   gtk_path + '\\lib\\gtk-2.0\\include',
                                   gtk_path + '\\include\\libglade-2.0'])
-    env_generic.Append(LIBPATH = [devil_path + '\\lib', 
+    env_generic.Append(LIBPATH = [devil_path + '\\lib',
                                   gtk_path + '\\lib'])
     env_generic.Append(LIBS = ['devil', 'ilu', 'glade-2.0', 'glib-2.0', 'gtk-win32-2.0',
                                'gobject-2.0', 'gdk-win32-2.0'])

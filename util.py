@@ -32,7 +32,7 @@ def get_arch():
     # Sometimes Python on Windows returns an empty string, so as a last resort, just assume it's
     # either x86 or x86_64 and use platform.architecture() to figure out which it is...
     elif machine == '' and platform == 'win32':
-        
+
         (bits, linkage) = platform.architecture()
 
         if bits == '32bit':
