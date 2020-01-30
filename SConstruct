@@ -65,7 +65,7 @@ else:
     # libglade needs this to connect UI callbacks
     env_generic.Append(LINKFLAGS = ['-rdynamic'])
 
-    env_generic.Append(LIBS = ['IL', 'ILU'])
+    env_generic.Append(LIBS = ['IL', 'ILU', 'm'])
 
     if arch == 'x86':
         env_generic.Append(ASFLAGS = ['-f elf32'])
